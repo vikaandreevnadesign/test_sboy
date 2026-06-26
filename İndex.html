@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Точка Сборки — Найди свой сбой</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#F5F0E8;
+    --ivory-soft:#EDE6D8;
+    --graphite:#2C2C2E;
+    --emerald:#0F4C3A;
+    --gold:#C9A961;
+    --bordo:#6E1E28;
+    --ink-blue:#16324F;
+    --line: rgba(44,44,46,0.12);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ivory);
+    color:var(--graphite);
+    font-family:'Jost', sans-serif;
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- декоративная сакральная геометрия фоном ---------- */
+  .bg-geometry{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .bg-geometry svg{
+    position:absolute;
+  }
+  .bg-top{ top:-120px; right:-140px; width:380px; height:380px; opacity:.16; }
+  .bg-bottom{ bottom:-160px; left:-160px; width:420px; height:420px; opacity:.10; }
+
+  .wrap{
+    position:relative;
+    z-index:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px 48px;
+  }
+
+  .stage{
+    width:100%;
+    max-width:480px;
+  }
+
+  /* ---------- signature element: треугольник точки сборки ---------- */
+  .constellation-box{
+    position:relative;
+    width:100%;
+    height:64px;
+    margin-bottom:22px;
+  }
+  .tri-svg{
+    position:absolute;
+    top:0; left:50%;
+    transform:translateX(-50%);
+    width:140px; height:64px;
+    overflow:visible;
+  }
+  .tri-line{
+    fill:none;
+    stroke:var(--line);
+    stroke-width:1;
+    stroke-dasharray:6 5;
+  }
+  .tri-line.fill-1, .tri-line.fill-2, .tri-line.fill-3{
+    stroke:var(--gold);
+    stroke-dasharray:200;
+    stroke-dashoffset:200;
+    transition:stroke-dashoffset .6s ease;
+  }
+  .node{
+    position:absolute;
+    width:10px; height:10px;
+    border-radius:50%;
+    background:var(--ivory-soft);
+    border:1.5px solid var(--line);
+    transition:all .45s ease;
+    transform:translate(-50%,-50%);
+  }
+  #node-personality{ left:50%; top:0; }
+  #node-space{ left:8%; top:100%; }
+  #node-realization{ left:92%; top:100%; }
+
+  .node.lit-personality{background:var(--bordo); border-color:var(--bordo); box-shadow:0 0 0 4px rgba(110,30,40,0.12);}
+  .node.lit-space{background:var(--ink-blue); border-color:var(--ink-blue); box-shadow:0 0 0 4px rgba(22,50,79,0.12);}
+  .node.lit-realization{background:var(--graphite); border-color:var(--graphite); box-shadow:0 0 0 4px rgba(44,44,46,0.12);}
+  .node.lit-balance{background:var(--emerald); border-color:var(--emerald); box-shadow:0 0 0 4px rgba(15,76,58,0.12);}
+
+  /* ---------- card ---------- */
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:40px 32px 32px;
+    position:relative;
+    box-shadow:0 1px 2px rgba(44,44,46,0.04);
+  }
+  .card::before{
+    content:'';
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:3px;
+    background:var(--gold);
+  }
+
+  .eyebrow{
+    font-size:11px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--gold);
+    font-weight:500;
+    margin-bottom:10px;
+    display:block;
+  }
+
+  h1{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:500;
+    font-size:30px;
+    line-height:1.25;
+    margin:0 0 14px;
+    color:var(--graphite);
+  }
+
+  .intro-text{
+    font-size:15px;
+    line-height:1.6;
+    color:rgba(44,44,46,0.75);
+    margin:0 0 28px;
+  }
+
+  .start-btn, .cta-btn{
+    width:100%;
+    background:var(--graphite);
+    color:var(--ivory);
+    border:none;
+    padding:16px;
+    font-family:'Jost', sans-serif;
+    font-size:14px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    cursor:pointer;
+    border-radius:1px;
+    transition:background .25s ease;
+  }
+  .start-btn:hover, .cta-btn:hover{ background:var(--emerald); }
+
+  .retry-btn{
+    width:100%;
+    background:transparent;
+    color:var(--graphite);
+    border:1px solid var(--line);
+    padding:14px;
+    font-family:'Jost', sans-serif;
+    font-size:13px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    cursor:pointer;
+    border-radius:1px;
+    margin-top:10px;
+    transition:all .2s ease;
+  }
+  .retry-btn:hover{ border-color:var(--gold); color:var(--gold); }
+
+  .progress-track{
+    display:flex;
+    gap:4px;
+    margin-bottom:26px;
+  }
+  .progress-seg{
+    flex:1;
+    height:2px;
+    background:var(--line);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .progress-seg.done{ background:var(--gold); }
+
+  .progress-count{
+    font-size:11px;
+    color:rgba(44,44,46,0.45);
+    margin-bottom:14px;
+    letter-spacing:0.03em;
+  }
+
+  .q-tag{
+    font-size:10px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    font-weight:500;
+    margin-bottom:12px;
+    display:inline-block;
+    padding:3px 9px;
+    border-radius:20px;
+  }
+  .q-tag.personality{ color:var(--bordo); background:rgba(110,30,40,0.08); }
+  .q-tag.space{ color:var(--ink-blue); background:rgba(22,50,79,0.08); }
+  .q-tag.realization{ color:var(--graphite); background:rgba(44,44,46,0.07); }
+
+  .q-text{
+    font-family:'Cormorant Garamond', serif;
+    font-size:21px;
+    font-weight:500;
+    line-height:1.35;
+    margin:0 0 22px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:8px;
+  }
+  .option{
+    text-align:left;
+    background:var(--ivory);
+    border:1px solid var(--line);
+    padding:14px 16px;
+    font-family:'Jost', sans-serif;
+    font-size:14.5px;
+    line-height:1.4;
+    color:var(--graphite);
+    cursor:pointer;
+    border-radius:1px;
+    transition:all .2s ease;
+  }
+  .option:hover{
+    border-color:var(--gold);
+    background:#fff;
+  }
+
+  .footer-note{
+    text-align:center;
+    font-size:11px;
+    color:rgba(44,44,46,0.4);
+    margin-top:22px;
+    letter-spacing:0.03em;
+  }
+
+  /* ---------- result ---------- */
+  .result-mark{
+    width:64px; height:64px;
+    border-radius:50%;
+    margin:0 auto 20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1.5px solid;
+  }
+  .result-mark svg{ width:26px; height:26px; }
+
+  .result-eyebrow{
+    text-align:center;
+    font-size:11px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+    font-weight:500;
+  }
+  .result-title{
+    font-family:'Cormorant Garamond', serif;
+    font-size:27px;
+    font-weight:500;
+    text-align:center;
+    margin:0 0 18px;
+    line-height:1.3;
+  }
+  .result-text{
+    font-size:14.5px;
+    line-height:1.65;
+    color:rgba(44,44,46,0.8);
+    margin:0 0 24px;
+  }
+  .divider{
+    width:36px;
+    height:1px;
+    background:var(--line);
+    margin:0 auto 24px;
+  }
+  .price-line{
+    text-align:center;
+    font-size:13px;
+    color:rgba(44,44,46,0.55);
+    margin-top:14px;
+    margin-bottom:14px;
+    letter-spacing:0.02em;
+  }
+
+  .hidden{display:none !important;}
+
+  @media (max-width:380px){
+    .card{ padding:30px 22px 26px; }
+    h1{ font-size:26px; }
+    .q-text{ font-size:18.5px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-geometry">
+  <svg class="bg-top" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="100" r="90" fill="none" stroke="#C9A961" stroke-width="0.7"/>
+    <circle cx="100" cy="50" r="58" fill="none" stroke="#C9A961" stroke-width="0.6"/>
+    <circle cx="60" cy="125" r="58" fill="none" stroke="#C9A961" stroke-width="0.6"/>
+    <circle cx="140" cy="125" r="58" fill="none" stroke="#C9A961" stroke-width="0.6"/>
+    <circle cx="100" cy="100" r="3" fill="#C9A961"/>
+  </svg>
+  <svg class="bg-bottom" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="100,8 188,150 12,150" fill="none" stroke="#2C2C2E" stroke-width="0.6"/>
+    <polygon points="100,40 165,140 35,140" fill="none" stroke="#2C2C2E" stroke-width="0.5"/>
+    <circle cx="100" cy="100" r="95" fill="none" stroke="#2C2C2E" stroke-width="0.4"/>
+  </svg>
+</div>
+
+<div class="wrap">
+<div class="stage">
+
+  <div class="constellation-box">
+    <svg class="tri-svg" viewBox="0 0 140 64">
+      <line id="line-1" class="tri-line fill-1" x1="70" y1="6" x2="12" y2="58"/>
+      <line id="line-2" class="tri-line fill-2" x1="70" y1="6" x2="128" y2="58"/>
+      <line id="line-3" class="tri-line fill-3" x1="12" y1="58" x2="128" y2="58"/>
+    </svg>
+    <div class="node" id="node-personality"></div>
+    <div class="node" id="node-space"></div>
+    <div class="node" id="node-realization"></div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="card" id="screen-intro">
+    <span class="eyebrow">Точка сборки</span>
+    <h1>Найди свой сбой</h1>
+    <p class="intro-text">15 вопросов. Покажу, в какой из трёх систем — Личность, Пространство или Реализация — у тебя сейчас перекос. А если перекоса нет — тоже скажу честно, это редкое и ценное состояние.</p>
+    <button class="start-btn" onclick="startQuiz()">Начать — 3 минуты</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="card hidden" id="screen-quiz">
+    <div class="progress-track" id="progress-track"></div>
+    <p class="progress-count" id="progress-count"></p>
+    <span class="q-tag" id="q-tag"></span>
+    <p class="q-text" id="q-text"></p>
+    <div class="options" id="q-options"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="card hidden" id="screen-result">
+    <div class="result-mark" id="result-mark"></div>
+    <span class="result-eyebrow" id="result-eyebrow"></span>
+    <h2 class="result-title" id="result-title"></h2>
+    <div class="divider"></div>
+    <p class="result-text" id="result-text"></p>
+    <button class="cta-btn" onclick="goToTelegram()">Написать в Telegram</button>
+    <p class="price-line" id="price-line"></p>
+    <button class="retry-btn" onclick="resetQuiz()">Пройти заново</button>
+  </div>
+
+  <p class="footer-note">Виктория · Точка Сборки</p>
+
+</div>
+</div>
+
+<script>
+const TELEGRAM_USERNAME = "kowiktori";
+
+const questions = [
+  // ЛИЧНОСТЬ
+  { category:"personality", tag:"Личность", text:"Когда у тебя что-то не получается:", options:[
+    {text:"Делаю выводы и спокойно двигаюсь дальше", score:1},
+    {text:"Немного расстраиваюсь, но быстро прихожу в себя", score:2},
+    {text:"Долго прокручиваю в голове, виню себя", score:3},
+    {text:"Замираю и не могу двигаться дальше", score:4}
+  ]},
+  { category:"personality", tag:"Личность", text:"Утро после выходных — какое оно у тебя?", options:[
+    {text:"Просыпаюсь с ощущением, что готова к новому", score:1},
+    {text:"Нормальное, есть лёгкая инерция", score:2},
+    {text:"Чувствую, что выходные не восстановили", score:3},
+    {text:"Уже с порога тревога о делах", score:4}
+  ]},
+  { category:"personality", tag:"Личность", text:"Тебе знакомо чувство, что ты живёшь не свой сценарий?", options:[
+    {text:"Нет, я живу по своим правилам", score:1},
+    {text:"Иногда ловлю себя на чужих ожиданиях", score:2},
+    {text:"Часто ощущаю, что играю не свою роль", score:3},
+    {text:"Это фоновое чувство уже давно", score:4}
+  ]},
+  { category:"personality", tag:"Личность", text:"Как ты реагируешь на критику?", options:[
+    {text:"Спокойно слушаю, беру полезное", score:1},
+    {text:"Немного задевает, но отхожу быстро", score:2},
+    {text:"Долго переживаю, прокручиваю разговор", score:3},
+    {text:"Сразу защищаюсь или закрываюсь", score:4}
+  ]},
+  { category:"personality", tag:"Личность", text:"Как ты относишься к себе сейчас?", options:[
+    {text:"В целом нравлюсь себе и доверяю себе", score:1},
+    {text:"Нормально, но есть к чему стремиться", score:2},
+    {text:"Часто критикую себя сильнее, чем заслуживаю", score:3},
+    {text:"Мне сложно быть на своей стороне", score:4}
+  ]},
+
+  // ПРОСТРАНСТВО
+  { category:"space", tag:"Пространство", text:"Как ты себя чувствуешь дома после рабочего дня?", options:[
+    {text:"Дом — место, где я восстанавливаюсь", score:1},
+    {text:"Нормально, но без особого эффекта", score:2},
+    {text:"Дома почему-то тяжелее, чем на работе", score:3},
+    {text:"Стараюсь меньше бывать дома", score:4}
+  ]},
+  { category:"space", tag:"Пространство", text:"Когда ты последний раз меняла что-то в жилье?", options:[
+    {text:"Недавно — и стало явно легче", score:1},
+    {text:"Хочу что-то поменять, скоро дойдут руки", score:2},
+    {text:"Давно хочу, но не двигается с места", score:3},
+    {text:"Даже не задумывалась об этом", score:4}
+  ]},
+  { category:"space", tag:"Пространство", text:"Твоё рабочее место или спальня — как тебе там?", options:[
+    {text:"Комфортно и продуктивно", score:1},
+    {text:"В целом неплохо, иногда некомфортно", score:2},
+    {text:"Часто отвлекаюсь, не могу сосредоточиться", score:3},
+    {text:"Вообще не задумывалась, как там всё расставлено", score:4}
+  ]},
+  { category:"space", tag:"Пространство", text:"Когда заходишь в новое место (квартира, офис, отель):", options:[
+    {text:"Сразу чувствую — комфортно тут или нет", score:1},
+    {text:"Привыкаю быстро, не обращаю внимания", score:2},
+    {text:"Часто ощущаю необъяснимую тревогу", score:3},
+    {text:"Вообще не замечаю обстановку вокруг", score:4}
+  ]},
+  { category:"space", tag:"Пространство", text:"Как ты относишься к идее переезда или смены места?", options:[
+    {text:"Спокойно, место не определяет меня", score:1},
+    {text:"Было бы неплохо что-то изменить", score:2},
+    {text:"Чувствую, что застряла в неподходящем месте", score:3},
+    {text:"Давно мечтаю переехать, но не решаюсь", score:4}
+  ]},
+
+  // РЕАЛИЗАЦИЯ
+  { category:"realization", tag:"Реализация", text:"Как ощущается твой доход сейчас?", options:[
+    {text:"Растёт, я в потоке", score:1},
+    {text:"Стабилен, но есть ощущение потолка", score:2},
+    {text:"Делаю много, а денег не прибавляется", score:3},
+    {text:"Не понимаю, в чём мой путь к деньгам", score:4}
+  ]},
+  { category:"realization", tag:"Реализация", text:"Что происходит, когда нужно сосредоточиться на одном деле?", options:[
+    {text:"Спокойно выбираю и иду до результата", score:1},
+    {text:"Иногда распыляюсь, но возвращаюсь к цели", score:2},
+    {text:"Берусь за всё сразу и теряю фокус", score:3},
+    {text:"Откладываю выбор месяцами", score:4}
+  ]},
+  { category:"realization", tag:"Реализация", text:"Как ты обычно действуешь с новой идеей?", options:[
+    {text:"Загораюсь и довожу до конца", score:1},
+    {text:"Загораюсь, но не всегда довожу", score:2},
+    {text:"Часто бросаю на середине", score:3},
+    {text:"Боюсь начинать, даже если идея сильная", score:4}
+  ]},
+  { category:"realization", tag:"Реализация", text:"Какая поддержка у тебя в твоём деле?", options:[
+    {text:"Меня окружают те, кто верит в меня", score:1},
+    {text:"Поддержка есть, но не всегда", score:2},
+    {text:"Чаще приходится доказывать, что я что-то могу", score:3},
+    {text:"Чувствую себя одной в своих целях", score:4}
+  ]},
+  { category:"realization", tag:"Реализация", text:"Как ты ощущаешь свою реализацию сейчас?", options:[
+    {text:"Чувствую, что иду своим путём", score:1},
+    {text:"В целом неплохо, но хочется больше", score:2},
+    {text:"Делаю что-то, но это не моё по сути", score:3},
+    {text:"Совсем не понимаю, в чём моя реализация", score:4}
+  ]}
+];
+
+const resultContent = {
+  balance: {
+    eyebrow:"Баланс",
+    color:"var(--emerald)",
+    title:"Сейчас у тебя ровно",
+    text:"Все три уровня — Личность, Пространство и Реализация — сейчас в неплохом балансе. Это редкое и ценное состояние, и его задача не «чинить», а закреплять и использовать для следующего шага. Хороший момент, чтобы не лечить проблему, а осознанно усилить то, что уже работает.",
+    icon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M5 12.5 9.5 17 19 7"/></svg>`,
+    priceKey:"balance"
+  },
+  personality: {
+    eyebrow:"Личность",
+    color:"var(--bordo)",
+    title:"Сбой больше всего в Личности",
+    text:"Внешне может быть всё в порядке, но внутри идёт постоянная борьба с собой — с виной, сценариями, повторяющимися реакциями. Пока этот слой не разобран, любые усилия в деньгах или пространстве работают лишь наполовину: энергия уходит на внутренний конфликт, а не на движение вперёд.",
+    icon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20c0-4 3-6.5 6.5-6.5s6.5 2.5 6.5 6.5"/></svg>`,
+    priceKey:"personality"
+  },
+  space: {
+    eyebrow:"Пространство",
+    color:"var(--ink-blue)",
+    title:"Сбой больше всего в Пространстве",
+    text:"Среда, в которой ты живёшь и работаешь, сейчас скорее забирает энергию, чем даёт её. Это не про красоту интерьера — это про то, как планировка и обстановка влияют на твои деньги, сон и решения. Иногда правка пространства даёт больше, чем месяцы работы с собой.",
+    icon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/></svg>`,
+    priceKey:"space"
+  },
+  realization: {
+    eyebrow:"Реализация",
+    color:"var(--graphite)",
+    title:"Сбой больше всего в Реализации",
+    text:"Внутри много ресурса и идей, но они не доходят до результата — распыляешься, откладываешь выбор, делаешь много, а доход не растёт пропорционально усилиям. Это типичная история для людей с широким кругозором: дело не в нехватке способностей, а в отсутствии одной точки сборки, через которую всё проходит.",
+    icon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 18 9 9l4 5 3-4 4 8"/></svg>`,
+    priceKey:"realization"
+  }
+};
+
+const priceLines = {
+  balance:"Диагностика «Точка Сборки» (закрепить результат) — от 12 000 ₽",
+  personality:"Энергосессия «Снятие блока» — от 3 000 ₽",
+  space:"Анализ пространства по Васту — от 5 000 ₽",
+  realization:"Диагностика «Точка Сборки» — от 12 000 ₽"
+};
+
+let currentQuestion = 0;
+let scores = { personality:0, space:0, realization:0 };
+const lines = ["line-1","line-2","line-3"];
+
+function startQuiz(){
+  document.getElementById('screen-intro').classList.add('hidden');
+  document.getElementById('screen-quiz').classList.remove('hidden');
+  buildProgressTrack();
+  renderQuestion();
+}
+
+function buildProgressTrack(){
+  const track = document.getElementById('progress-track');
+  track.innerHTML = '';
+  questions.forEach(() => {
+    const seg = document.createElement('div');
+    seg.className = 'progress-seg';
+    track.appendChild(seg);
+  });
+}
+
+function renderQuestion(){
+  const q = questions[currentQuestion];
+
+  document.getElementById('progress-count').textContent =
+    "Вопрос " + (currentQuestion+1) + " из " + questions.length;
+
+  const tagEl = document.getElementById('q-tag');
+  tagEl.textContent = q.tag;
+  tagEl.className = 'q-tag ' + q.category;
+
+  document.getElementById('q-text').textContent = q.text;
+
+  const optionsEl = document.getElementById('q-options');
+  optionsEl.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = opt.text;
+    btn.onclick = () => selectAnswer(q.category, opt.score);
+    optionsEl.appendChild(btn);
+  });
+
+  const segs = document.querySelectorAll('.progress-seg');
+  segs.forEach((s, i) => {
+    if(i < currentQuestion) s.classList.add('done');
+    else s.classList.remove('done');
+  });
+
+  lightNode(q.category);
+  growTriangle();
+}
+
+function lightNode(category){
+  ['personality','space','realization'].forEach(c=>{
+    document.getElementById('node-' + c).classList.remove('lit-' + c);
+  });
+  document.getElementById('node-' + category).classList.add('lit-' + category);
+}
+
+function growTriangle(){
+  const progress = currentQuestion / questions.length; // 0..1
+  const filled = Math.round(progress * 3);
+  lines.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.style.strokeDashoffset = i < filled ? 0 : 200;
+  });
+}
+
+function select
