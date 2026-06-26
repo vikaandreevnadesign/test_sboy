@@ -85,13 +85,6 @@
             line-height: 1.2;
         }
 
-        .gold-line {
-            width: 48px;
-            height: 1px;
-            background: var(--gold);
-            margin: 12px 0 18px;
-        }
-
         p {
             font-size: 14px;
             line-height: 1.7;
@@ -348,16 +341,9 @@
         }
 
         @media (max-width: 600px) {
-            .quiz-container {
-                padding: 28px 18px;
-            }
-            .cover-layout {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-            .cover-photo {
-                margin: 0 auto;
-            }
+            .quiz-container { padding: 28px 18px; }
+            .cover-layout { grid-template-columns: 1fr; text-align: center; }
+            .cover-photo { margin: 0 auto; }
             h1 { font-size: 26px; }
             h2 { font-size: 22px; }
             .question-text { font-size: 18px; }
@@ -384,7 +370,7 @@
                 <button class="btn btn-primary" id="btnStart">Начать диагностику</button>
             </div>
             <div class="cover-photo">
-                <img src="IMG_20260528_215402.png" alt="Виктория Кокурина">
+                <img src="foto.jpg" alt="Виктория Кокурина">
             </div>
         </div>
     </div>
@@ -418,7 +404,7 @@
         <div class="result-body" id="resultBody"></div>
         <div class="expert-block">
             <div class="expert-photo">
-                <img src="IMG_20260528_215402.png" alt="Виктория Кокурина">
+                <img src="foto.jpg" alt="Виктория Кокурина">
             </div>
             <div class="expert-text">
                 <strong>Виктория Кокурина</strong><br>
@@ -582,7 +568,10 @@
     ];
 
     function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+        var screens = document.querySelectorAll('.screen');
+        for (var i = 0; i < screens.length; i++) {
+            screens[i].classList.remove('active');
+        }
         document.getElementById(id).classList.add('active');
     }
 
@@ -603,23 +592,27 @@
         document.getElementById('progressFill').style.width = ((currentQ + 1) / 10 * 100) + '%';
 
         var html = '';
-        q.options.forEach(function(opt, i) {
-            html += '<div class="option" data-idx="' + i + '">' +
-                        '<span class="letter">' + opt.letter + '</span>' +
-                        '<span class="text">' + opt.text + '</span>' +
+        for (var j = 0; j < q.options.length; j++) {
+            html += '<div class="option" data-idx="' + j + '">' +
+                        '<span class="letter">' + q.options[j].letter + '</span>' +
+                        '<span class="text">' + q.options[j].text + '</span>' +
                     '</div>';
-        });
+        }
         document.getElementById('optionsList').innerHTML = html;
 
         var options = document.querySelectorAll('#optionsList .option');
-        options.forEach(function(opt, i) {
-            opt.addEventListener('click', function() {
-                options.forEach(function(o) { o.classList.remove('selected'); });
-                opt.classList.add('selected');
-                selectedScore = questions[currentQ].options[i].score;
-                document.getElementById('btnNext').disabled = false;
-            });
-        });
+        for (var k = 0; k < options.length; k++) {
+            (function(idx) {
+                options[idx].addEventListener('click', function() {
+                    for (var m = 0; m < options.length; m++) {
+                        options[m].classList.remove('selected');
+                    }
+                    options[idx].classList.add('selected');
+                    selectedScore = questions[currentQ].options[idx].score;
+                    document.getElementById('btnNext').disabled = false;
+                });
+            })(k);
+        }
 
         var btn = document.getElementById('btnNext');
         btn.disabled = true;
