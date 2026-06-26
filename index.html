@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Диагностический тест проекта «Точка Сборки». Определите ваш текущий внутренний сценарий и узнайте, с чего начать изменения.">
+    <meta name="description" content="Точка Сборки — диагностика внутреннего сценария. Определите ваш текущий сценарий, поймите почему повторяются жизненные ситуации и узнайте с чего начать изменения.">
     <meta name="theme-color" content="#F5F0E8">
     <title>Точка Сборки — Диагностика внутреннего сценария</title>
 
@@ -34,61 +34,92 @@
             background: var(--ivory);
             color: var(--graphite);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
             -webkit-font-smoothing: antialiased;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .quiz-container {
+        .page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
             width: 100%;
             max-width: 680px;
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
-            padding: 48px 40px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid var(--border);
+            margin: 0 auto;
         }
 
-        .screen { display: none; }
-        .screen.active { display: block; }
-
-        .section-tag {
-            font-size: 10px;
+        /* ===== СТАРТОВЫЙ ЭКРАН — ЛЕНДИНГ ===== */
+        .landing {
+            text-align: center;
+            padding: 40px 0;
+        }
+        .landing-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .landing-brand {
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             color: var(--gold);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 500;
         }
-
-        h1 {
+        .landing-photo {
+            width: 220px;
+            height: 280px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin: 0 auto 28px;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 12px 40px rgba(44, 44, 46, 0.06);
+        }
+        .landing-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .landing h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 32px;
+            font-size: 34px;
             font-weight: 700;
             color: var(--graphite);
             margin-bottom: 14px;
             line-height: 1.15;
             letter-spacing: -0.3px;
         }
-
-        h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--graphite);
-            margin-bottom: 12px;
-            line-height: 1.2;
-        }
-
-        p {
-            font-size: 14px;
-            line-height: 1.7;
+        .landing-subtitle {
+            font-size: 15px;
             color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.7;
+            max-width: 440px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .landing-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+        .landing-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .landing-meta .dot {
+            width: 5px;
+            height: 5px;
+            background: var(--gold);
+            border-radius: 50%;
         }
 
         .btn {
@@ -96,9 +127,9 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 14px 32px;
+            padding: 16px 36px;
             font-family: 'Inter', sans-serif;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
             border: none;
             border-radius: 50px;
@@ -108,7 +139,6 @@
             letter-spacing: 0.4px;
             white-space: nowrap;
         }
-
         .btn-primary {
             background: var(--graphite);
             color: var(--white);
@@ -132,32 +162,46 @@
             pointer-events: none;
         }
 
-        .cover-layout {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 32px;
-            align-items: center;
+        .gold-line {
+            width: 48px;
+            height: 1px;
+            background: var(--gold);
+            margin: 16px auto;
         }
-        .cover-photo {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
-            border: 1px solid var(--border-gold);
+
+        /* ===== КАРТОЧКА ТЕСТА (ЭКРАНЫ 2-3) ===== */
+        .quiz-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            padding: 48px 40px;
+            border: 1px solid var(--border);
         }
-        .cover-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        .section-tag {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-weight: 500;
         }
-        .cover-meta {
-            display: flex;
-            gap: 16px;
-            margin: 10px 0 18px;
-            font-size: 12px;
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--graphite);
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        p {
+            font-size: 14px;
+            line-height: 1.7;
             color: var(--text-muted);
-            letter-spacing: 0.5px;
         }
 
         .progress-wrap {
@@ -341,10 +385,9 @@
         }
 
         @media (max-width: 600px) {
-            .quiz-container { padding: 28px 18px; }
-            .cover-layout { grid-template-columns: 1fr; text-align: center; }
-            .cover-photo { margin: 0 auto; }
-            h1 { font-size: 26px; }
+            .quiz-card { padding: 28px 18px; }
+            .landing-photo { width: 180px; height: 230px; }
+            .landing h1 { font-size: 26px; }
             h2 { font-size: 22px; }
             .question-text { font-size: 18px; }
             .result-title { font-size: 20px; }
@@ -353,80 +396,95 @@
 </head>
 <body>
 
-<div class="quiz-container">
+<!-- ========== СТАРТОВЫЙ ЭКРАН — ЛЕНДИНГ ========== -->
+<div class="page" id="pageLanding">
+    <div class="container">
+        <div class="landing">
+            <div class="landing-header">
+                <div class="landing-brand">Точка сборки</div>
+            </div>
 
-    <!-- СТАРТ -->
-    <div class="screen active" id="screenStart">
-        <div class="cover-layout">
-            <div>
-                <div class="section-tag">Точка сборки</div>
-                <h1>Диагностика внутреннего сценария</h1>
-                <p style="margin-bottom:12px;">Это не тест. Это мини-диагностика вашей текущей жизненной модели. Вы увидите, какой сценарий повторяется, почему и с чего начать изменения.</p>
-                <div class="cover-meta">
-                    <span>10 вопросов</span>
-                    <span>3 минуты</span>
-                    <span>Без оценок</span>
+            <div class="landing-photo">
+                <img src="foto.jpg" alt="Виктория Кокурина">
+            </div>
+
+            <h1>Диагностика<br>внутреннего сценария</h1>
+
+            <p class="landing-subtitle">Это не тест. Это мини-диагностика вашей текущей жизненной модели. Вы увидите, какой сценарий повторяется, почему и с чего начать изменения.</p>
+
+            <div class="landing-meta">
+                <span><span class="dot"></span> 10 вопросов</span>
+                <span><span class="dot"></span> 3 минуты</span>
+                <span><span class="dot"></span> Без оценок</span>
+            </div>
+
+            <button class="btn btn-primary" id="btnStart">Начать диагностику</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== ЭКРАН ВОПРОСОВ ========== -->
+<div class="page" id="pageQuestion" style="display:none;">
+    <div class="container">
+        <div class="quiz-card">
+            <div class="screen active" id="screenQuestion">
+                <div class="progress-wrap">
+                    <div class="progress-top">
+                        <span id="progressLabel">Вопрос 1 из 10</span>
+                        <span id="progressPercent">10%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width:10%;"></div>
+                    </div>
                 </div>
-                <button class="btn btn-primary" id="btnStart">Начать диагностику</button>
-            </div>
-            <div class="cover-photo">
-                <img src="foto.jpg" alt="Виктория Кокурина">
+                <div class="question-num" id="qNum">ВОПРОС 1</div>
+                <div class="question-text" id="qText"></div>
+                <div class="options-list" id="optionsList"></div>
+                <div class="btn-next-wrap">
+                    <button class="btn btn-primary" id="btnNext" disabled>ДАЛЕЕ</button>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- ВОПРОСЫ -->
-    <div class="screen" id="screenQuestion">
-        <div class="progress-wrap">
-            <div class="progress-top">
-                <span id="progressLabel">Вопрос 1 из 10</span>
-                <span id="progressPercent">10%</span>
+<!-- ========== ЭКРАН РЕЗУЛЬТАТА ========== -->
+<div class="page" id="pageResult" style="display:none;">
+    <div class="container">
+        <div class="quiz-card">
+            <div class="screen active" id="screenResult">
+                <div class="result-header">
+                    <div class="result-icon" id="resultIcon"></div>
+                    <div class="result-subtitle" id="resultSubtitle"></div>
+                    <div class="result-title" id="resultTitle"></div>
+                </div>
+                <div class="result-body" id="resultBody"></div>
+                <div class="expert-block">
+                    <div class="expert-photo">
+                        <img src="foto.jpg" alt="Виктория Кокурина">
+                    </div>
+                    <div class="expert-text">
+                        <strong>Виктория Кокурина</strong><br>
+                        автор метода «Точка сборки»
+                    </div>
+                </div>
+                <div class="result-actions">
+                    <a href="https://www.instagram.com/kowiktori" target="_blank" class="btn btn-primary">Написать «СТАРТ»</a>
+                    <button class="btn btn-outline" id="btnRestart">Пройти заново</button>
+                </div>
+                <div class="social-row">
+                    <a href="https://www.instagram.com/kowiktori" target="_blank" class="social-pill">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm6.958 14.693c-.113 2.48-.517 4.173-2.744 4.179-1.32.004-2.477.006-6.214.006s-4.894-.002-6.214-.006c-2.227-.006-2.631-1.699-2.744-4.179-.04-.859-.043-1.725-.042-2.693 0-.968.002-1.834.042-2.693.113-2.48.517-4.173 2.744-4.179C5.106 5.124 6.263 5.122 10 5.122s4.894.002 6.214.006c2.227.006 2.631 1.699 2.744 4.179.04.859.043 1.725.042 2.693 0 .968-.002 1.834-.042 2.693zM12 6.5c-3.038 0-5.5 2.462-5.5 5.5s2.462 5.5 5.5 5.5 5.5-2.462 5.5-5.5-2.462-5.5-5.5-5.5zm0 9.063c-1.968 0-3.563-1.595-3.563-3.563S10.032 8.437 12 8.437s3.563 1.595 3.563 3.563-1.595 3.563-3.563 3.563z"/></svg>
+                        @kowiktori
+                    </a>
+                    <a href="https://t.me/kowiktori" target="_blank" class="social-pill">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18.717-.962 4.084-1.362 5.424-.168.704-.5.94-.822.964-.7.065-1.232-.462-1.91-.907-1.062-.696-1.663-1.13-2.693-1.81-1.191-.785-.42-1.518.26-2.31.177-.206 3.152-2.89 3.21-3.136.007-.03.014-.145-.054-.205-.068-.06-.168-.04-.24-.024-.102.024-1.73 1.1-4.882 3.226-.462.317-.88.472-1.254.464-.413-.01-1.206-.233-1.796-.425-.724-.235-1.298-.36-1.248-.76.026-.21.316-.425.87-.645 3.407-1.485 5.68-2.464 6.818-2.937 3.246-1.35 3.92-1.585 4.36-1.593.096-.002.312.022.452.135.117.095.15.223.165.313.016.09.036.295.02.455z"/></svg>
+                        @kowiktori
+                    </a>
+                </div>
             </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width:10%;"></div>
-            </div>
-        </div>
-        <div class="question-num" id="qNum">ВОПРОС 1</div>
-        <div class="question-text" id="qText"></div>
-        <div class="options-list" id="optionsList"></div>
-        <div class="btn-next-wrap">
-            <button class="btn btn-primary" id="btnNext" disabled>ДАЛЕЕ</button>
         </div>
     </div>
-
-    <!-- РЕЗУЛЬТАТ -->
-    <div class="screen" id="screenResult">
-        <div class="result-header">
-            <div class="result-icon" id="resultIcon"></div>
-            <div class="result-subtitle" id="resultSubtitle"></div>
-            <div class="result-title" id="resultTitle"></div>
-        </div>
-        <div class="result-body" id="resultBody"></div>
-        <div class="expert-block">
-            <div class="expert-photo">
-                <img src="foto.jpg" alt="Виктория Кокурина">
-            </div>
-            <div class="expert-text">
-                <strong>Виктория Кокурина</strong><br>
-                автор метода «Точка сборки»
-            </div>
-        </div>
-        <div class="result-actions">
-            <a href="https://www.instagram.com/kowiktori" target="_blank" class="btn btn-primary">Написать «СТАРТ»</a>
-            <button class="btn btn-outline" id="btnRestart">Пройти заново</button>
-        </div>
-        <div class="social-row">
-            <a href="https://www.instagram.com/kowiktori" target="_blank" class="social-pill">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm6.958 14.693c-.113 2.48-.517 4.173-2.744 4.179-1.32.004-2.477.006-6.214.006s-4.894-.002-6.214-.006c-2.227-.006-2.631-1.699-2.744-4.179-.04-.859-.043-1.725-.042-2.693 0-.968.002-1.834.042-2.693.113-2.48.517-4.173 2.744-4.179C5.106 5.124 6.263 5.122 10 5.122s4.894.002 6.214.006c2.227.006 2.631 1.699 2.744 4.179.04.859.043 1.725.042 2.693 0 .968-.002 1.834-.042 2.693zM12 6.5c-3.038 0-5.5 2.462-5.5 5.5s2.462 5.5 5.5 5.5 5.5-2.462 5.5-5.5-2.462-5.5-5.5-5.5zm0 9.063c-1.968 0-3.563-1.595-3.563-3.563S10.032 8.437 12 8.437s3.563 1.595 3.563 3.563-1.595 3.563-3.563 3.563z"/></svg>
-                @kowiktori
-            </a>
-            <a href="https://t.me/kowiktori" target="_blank" class="social-pill">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18.717-.962 4.084-1.362 5.424-.168.704-.5.94-.822.964-.7.065-1.232-.462-1.91-.907-1.062-.696-1.663-1.13-2.693-1.81-1.191-.785-.42-1.518.26-2.31.177-.206 3.152-2.89 3.21-3.136.007-.03.014-.145-.054-.205-.068-.06-.168-.04-.24-.024-.102.024-1.73 1.1-4.882 3.226-.462.317-.88.472-1.254.464-.413-.01-1.206-.233-1.796-.425-.724-.235-1.298-.36-1.248-.76.026-.21.316-.425.87-.645 3.407-1.485 5.68-2.464 6.818-2.937 3.246-1.35 3.92-1.585 4.36-1.593.096-.002.312.022.452.135.117.095.15.223.165.313.016.09.036.295.02.455z"/></svg>
-                @kowiktori
-            </a>
-        </div>
-    </div>
-
 </div>
 
 <script>
@@ -567,12 +625,11 @@
         }
     ];
 
-    function showScreen(id) {
-        var screens = document.querySelectorAll('.screen');
-        for (var i = 0; i < screens.length; i++) {
-            screens[i].classList.remove('active');
-        }
-        document.getElementById(id).classList.add('active');
+    function showPage(id) {
+        document.getElementById('pageLanding').style.display = 'none';
+        document.getElementById('pageQuestion').style.display = 'none';
+        document.getElementById('pageResult').style.display = 'none';
+        document.getElementById(id).style.display = 'flex';
     }
 
     function startQuiz() {
@@ -580,7 +637,7 @@
         currentQ = 0;
         selectedScore = null;
         renderQuestion();
-        showScreen('screenQuestion');
+        showPage('pageQuestion');
     }
 
     function renderQuestion() {
@@ -648,7 +705,7 @@
         document.getElementById('resultSubtitle').textContent = r.subtitle;
         document.getElementById('resultTitle').textContent = r.title;
         document.getElementById('resultBody').innerHTML = r.body;
-        showScreen('screenResult');
+        showPage('pageResult');
     }
 
     function restartQuiz() {
